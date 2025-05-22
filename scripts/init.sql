@@ -39,3 +39,23 @@ CREATE TABLE "historico_tarefas" (
   "status_anterior" varchar,
   "status_atual" varchar
 );
+
+-- Inserir alguns usuários de teste
+INSERT INTO usuarios (nome, email, senha) VALUES 
+('João Silva', 'joao@email.com', '123456'),
+('Maria Santos', 'maria@email.com', '123456'),
+('Pedro Oliveira', 'pedro@email.com', '123456');
+
+-- Inserir algumas categorias de teste
+INSERT INTO categorias (nome) VALUES 
+('Trabalho'),
+('Pessoal'),
+('Estudos'),
+('Casa');
+
+-- Inserir algumas tarefas de teste
+INSERT INTO tarefas (titulo, descricao, status, data_criacao, usuario_id) VALUES 
+('Finalizar relatório mensal', 'Compilar dados de vendas e criar apresentação', 'pendente', CURRENT_DATE, 1),
+('Comprar ingredientes para jantar', 'Lista: arroz, feijão, carne, salada', 'pendente', CURRENT_DATE, 2),
+('Estudar para prova de JavaScript', 'Revisar conceitos de async/await e promises', 'em-andamento', CURRENT_DATE, 3),
+('Organizar armário do quarto', 'Separar roupas que não uso mais', 'concluida', CURRENT_DATE - INTERVAL '2 days', 2);
