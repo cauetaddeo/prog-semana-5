@@ -1,83 +1,43 @@
-# Boilerplate MVC em Node.js com PostgreSQL
+# Descrição do sistema escolhido
 
-Este projeto é um boilerplate básico para uma aplicação Node.js seguindo o padrão MVC (Model-View-Controller), utilizando PostgreSQL como banco de dados.
+Este projeto é um sistema de gerenciamento de tarefas desenvolvido como parte do Projeto Individual (COMP Parte 1). Ele é um exemplo que serve para que usuários cadastrem tarefas, associem a categorias e visualizem os dados através de uma API estruturada em Node.js com o framework Express, utilizando o padrão de projeto MVC (Model-View-Controller).
 
-## Requisitos
+## Estrutura de pastas e arquivos
 
-- Node.js (versão X.X.X)
-- PostgreSQL (versão X.X.X)
-
-## Instalação
-
-1. **Clonar o repositório:**
-
-```bash
-   git clone https://github.com/seu-usuario/seu-projeto.git
-   cd seu-projeto
+O projeto está organizado da seguinte forma:
+```
+mvc-boilerplate/
+├── assets/ # Arquivos públicos como imagens e fontes
+├── config/ # Arquivos de configuração
+├── controllers/ # Controladores das requisições
+├── docs/ # Documentação do projeto
+│ └── modelo-banco.png # Modelo relacional do banco de dados
+├── models/ # Modelos de dados
+├── routes/ # Definição das rotas
+├── scripts/ # Scripts JavaScript públicos
+├── services/ # Serviços auxiliares
+├── styles/ # Estilos CSS
+├── tests/ # Testes automatizados
+├── views/ # Templates de interface (EJS)
+├── .env.example # Exemplo de variáveis de ambiente
+├── .gitignore
+├── jest.config.js
+├── package.json
+├── package-lock.json
+├── server.js # Arquivo principal do servidor
+└── wad.md
 ```
 
-2. **Instalar as dependências:**
-    
-```bash
+
+## Como executar o projeto localmente
+
+   ```bash
+   git clone https://github.com/seu-usuario/seu-repositorio.git
+   cd seu-repositorio
+
+
 npm install
-```
-    
-3. **Configurar o arquivo `.env`:**
-    
-Renomeie o arquivo `.env.example` para `.env` e configure as variáveis de ambiente necessárias, como as configurações do banco de dados PostgreSQL.
-    
 
-Configuração do Banco de Dados
-------------------------------
+node server.js
 
-1. **Criar banco de dados:**
-    
-    Crie um banco de dados PostgreSQL com o nome especificado no seu arquivo `.env`.
-    
-2. **Executar o script SQL de inicialização:**
-    
-```bash
-npm run init-db
-```
-    
-Isso criará a tabela `users` no seu banco de dados PostgreSQL com UUID como chave primária e inserirá alguns registros de exemplo.
-    
-
-Funcionalidades
----------------
-
-* **Padrão MVC:** Estrutura organizada em Model, View e Controller.
-* **PostgreSQL:** Banco de dados relacional utilizado para persistência dos dados.
-* **UUID:** Utilização de UUID como chave primária na tabela `users`.
-* **Scripts com `nodemon`:** Utilização do `nodemon` para reiniciar automaticamente o servidor após alterações no código.
-* **Testes:** Inclui estrutura básica para testes automatizados.
-
-Scripts Disponíveis
--------------------
-
-* `npm start`: Inicia o servidor Node.js.
-* `npm run dev`: Inicia o servidor com `nodemon`, reiniciando automaticamente após alterações no código.
-* `npm run test`: Executa os testes automatizados.
-* `npm run test:coverage`: Executa os testes e gera um relatório de cobertura de código.
-
-Estrutura de Diretórios
------------------------
-
-* **`config/`**: Configurações do banco de dados e outras configurações do projeto.
-* **`controllers/`**: Controladores da aplicação (lógica de negócio).
-* **`models/`**: Modelos da aplicação (definições de dados e interações com o banco de dados).
-* **`routes/`**: Rotas da aplicação.
-* **`tests/`**: Testes automatizados.
-* **`views/`**: Views da aplicação (se aplicável).
-
-Contribuição
-------------
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir um issue ou enviar um pull request.
-
-Licença
--------
-
-Este projeto está licenciado sob a Licença MIT.
-
-Este README.md fornece uma visão geral clara do boilerplate, incluindo instruções de instalação, configuração do banco de dados, funcionalidades principais, scripts disponíveis, estrutura de diretórios, como contribuir e informações de licença. Certifique-se de personalizar as seções com detalhes específicos do seu projeto conforme necessário.
+http://localhost:3000
