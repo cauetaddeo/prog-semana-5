@@ -44,7 +44,9 @@ CREATE TABLE "historico_tarefas" (
 INSERT INTO usuarios (nome, email, senha) VALUES 
 ('João Silva', 'joao@email.com', '123456'),
 ('Maria Santos', 'maria@email.com', '123456'),
-('Pedro Oliveira', 'pedro@email.com', '123456');
+('Pedro Oliveira', 'pedro@email.com', '123456'),
+('Soreh Maria', 'soreh@email.com', '123456');
+
 
 -- Inserir algumas categorias de teste
 INSERT INTO categorias (nome) VALUES 
