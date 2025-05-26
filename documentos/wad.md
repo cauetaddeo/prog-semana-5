@@ -26,3 +26,10 @@ O relacionamento entre as tabelas permite que:
 - Um usuário tenha várias tarefas;
 - Uma tarefa possa pertencer a várias categorias;
 - Uma categoria possa agrupar várias tarefas.
+
+
+## Diagrama de Arquitetura
+
+Diagrama de arquitetura está representado na imagem abaixo:
+
+![alt text](<diagrama de arquitetura.png>)
