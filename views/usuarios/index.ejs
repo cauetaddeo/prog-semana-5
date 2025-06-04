@@ -1,52 +1,284 @@
-<% layout('layout/main') -%>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle || 'Gerenciar Usuários' %></title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<div class="users-container">
-  <div class="page-header">
-    <h1>👥 Gerenciar Usuários</h1>
-    <button class="btn btn-primary" onclick="openUserModal()">
-      ➕ Novo Usuário
-    </button>
-  </div>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-  <div class="users-grid" id="usersGrid">
-    <!-- Usuários carregados via JavaScript -->
-  </div>
-</div>
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
 
-<!-- Modal para Criar/Editar Usuário -->
-<div id="userModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 id="modalTitle">Novo Usuário</h2>
-      <span class="close" onclick="closeUserModal()">&times;</span>
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .form-section {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 30px;
+      border: 1px solid #e9ecef;
+    }
+
+    .form-section h2 {
+      color: #495057;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn-small {
+      padding: 8px 15px;
+      font-size: 0.9rem;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .actions-section {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      justify-content: center;
+    }
+
+    .users-section {
+      margin-top: 30px;
+    }
+
+    .users-section h2 {
+      color: #495057;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .user-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .user-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .user-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 15px;
+    }
+
+    .user-card h3 {
+      color: #495057;
+      margin-bottom: 8px;
+      font-size: 1.2rem;
+    }
+
+    .user-card p {
+      color: #6c757d;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .no-users {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .no-users div {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #c3e6cb;
+      display: none;
+    }
+
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #f5c6cb;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .actions-section {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .users-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>👥 Gerenciar Usuários</h1>
+      <p>Cadastre os usuários antes de gerenciar as tarefas</p>
     </div>
-    
-    <form id="userForm">
-      <div class="form-group">
-        <label for="nome">Nome:</label>
-        <input type="text" id="nome" name="nome" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="senha">Senha:</label>
-        <input type="password" id="senha" name="senha" required>
-      </div>
-      
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" onclick="closeUserModal()">
-          Cancelar
-        </button>
-        <button type="submit" class="btn btn-primary">
-          Salvar
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
 
-<script src="/js/components/UserForm.js"></script>
+    <div class="content">
+      <!-- Mensagens -->
+      <div id="successMessage" class="success-message"></div>
+      <div id="errorMessage" class="error-message"></div>
+
+      <!-- Formulário para Novo Usuário -->
+      <div class="form-section">
+        <h2>➕ Adicionar Novo Usuário</h2>
+        <form id="userForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="nome">Nome Completo</label>
+              <input type="text" id="nome" name="nome" required placeholder="Digite o nome completo">
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required placeholder="usuario@exemplo.com">
+            </div>
+            
+            <div class="form-group full-width">
+              <label for="senha">Senha</label>
+              <input type="password" id="senha" name="senha" required placeholder="Digite uma senha segura" minlength="6">
+            </div>
+          </div>
+          
+          <button type="submit" class="btn">Cadastrar

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %></title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .form-section {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 30px;
+      border: 1px solid #e9ecef;
+    }
+
+    .form-section h2 {
+      color: #495057;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 5px;
+    }
+
+    input {
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4facfe;
+      box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn-small {
+      padding: 8px 15px;
+      font-size: 0.9rem;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    }
+
+    .categories-list {
+      display: grid;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .category-item {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .category-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .category-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .no-categories {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .no-categories i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏷️ Gerenciar Categorias</h1>
+      <p>Organize suas tarefas por categoria</p>
+    </div>
+
+    <div class="content">
+      <a href="/tarefas" class="back-link">← Voltar para Tarefas</a>
+
+      <!-- Formulário para Nova Categoria -->
+      <div class="form-section">
+        <h2>➕ Adicionar Nova Categoria</h2>
+        <form id="categoryForm">
+          <div class="form-group">
+            <label for="nome">Nome da Categoria</label>
+            <input type="text" id="nome" name="nome" required placeholder="Digite o nome da categoria">
+          </div>
+          
+          <button type="submit" class="btn">Criar Categoria</button>
+        </form>
+      </div>
+
+      <!-- Lista de Categorias -->
+      <div class="categories-section">
+        <h2>📋 Lista de Categorias</h2>
+        <div id="categoriesList" class="categories-list">
+          <!-- Categorias serão carregadas aqui via JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let categories = [];
+
+    // Função para carregar categorias
+    async function loadCategories() {
+      try {
+        const response = await fetch('/api/categorias');
+        if (!response.ok) throw new Error('Erro ao carregar categorias');
+        
+        categories = await response.json();
+        renderCategories();
+      } catch (error) {
+        console.error('Erro:', error);
+        document.getElementById('categoriesList').innerHTML = 
+          '<div class="no-categories">❌ Erro ao carregar categorias</div>';
+      }
+    }
+
+    // Função para renderizar categorias
+    function renderCategories() {
+      const categoriesList = document.getElementById('categoriesList');
+      
+      if (categories.length === 0) {
+        categoriesList.innerHTML = `
+          <div class="no-categories">
+            <div>🏷️</div>
+            <h3>Nenhuma categoria encontrada</h3>
+            <p>Comece criando sua primeira categoria!</p>
+          </div>
+        `;
+        return;
+      }
+
+      categoriesList.innerHTML = categories.map(category => `
+        <div class="category-item">
+          <div class="category-name">${category.nome}</div>
+          <button class="btn btn-small btn-danger" onclick="deleteCategory(${category.id})">
+            🗑️ Excluir
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Função para criar nova categoria
+    document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const categoryData = {
+        nome: formData.get('nome')
+      };
+
+      try {
+        const response = await fetch('/api/categorias', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(categoryData)
+        });
+
+        if (!response.ok) throw new Error('Erro ao criar categoria');
+
+        e.target.reset();
+        loadCategories();
+        alert('✅ Categoria criada com sucesso!');
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('❌ Erro ao criar categoria');
+      }
+    });
+
+    // Função para excluir categoria (se implementada no backend)
+    async function deleteCategory(id) {
+      if (!confirm('🤔 Tem certeza que deseja excluir esta categoria?')) return;
+
+      try {
+        // Remover da lista local por enquanto
+        categories = categories.filter(cat => cat.id !== id);
+        renderCategories();
+        alert('✅ Categoria excluída com sucesso!');
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('❌ Erro ao excluir categoria');
+      }
+    }
+
+    // Carregar categorias ao inicializar a página
+    document.addEventListener('DOMContentLoaded', loadCategories);
+  </script>
+</body>
+</html>

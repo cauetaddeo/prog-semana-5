@@ -42,6 +42,28 @@ app.get('/dashboard', async (req, res) => {
   }
 });
 
+// Rota para página de usuários
+app.get('/usuarios', async (req, res) => {
+  try {
+    res.render('usuarios/index', {
+      pageTitle: 'Gerenciar Usuários - TaskManager'
+    });
+  } catch (err) {
+    res.status(500).send('Erro ao carregar página de usuários: ' + err.message);
+  }
+});
+
+// Rota para página de categorias
+app.get('/categorias', async (req, res) => {
+  try {
+    res.render('categorias/index', {
+      pageTitle: 'Gerenciar Categorias - TaskManager'
+    });
+  } catch (err) {
+    res.status(500).send('Erro ao carregar página de categorias: ' + err.message);
+  }
+});
+
 // Middleware de erro 404
 app.use((req, res, next) => {
   res.status(404).render('pages/404', {
