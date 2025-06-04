@@ -1,108 +1,148 @@
-const Usuario = require('../models/Usuario');
-
-const usuarios = []; // Simulando um banco em memória
+const UsuarioService = require('../services/userService');
 
 module.exports = {
   // Renderizar página de usuários
-  renderUsuarios: (req, res) => {
-    res.render('usuarios/index', {
-      usuarios: usuarios,
-      pageTitle: 'Gerenciar Usuários'
-    });
+  renderUsuarios: async (req, res) => {
+    try {
+      const usuarios = await UsuarioService.getAllUsers();
+      res.render('usuarios/index', {
+        usuarios: usuarios,
+        pageTitle: 'Gerenciar Usuários'
+      });
+    } catch (error) {
+      console.error('Erro ao renderizar usuários:', error);
+      res.status(500).send('Erro ao carregar página de usuários: ' + error.message);
+    }
   },
 
   // API - Listar usuários (JSON)
-  listarUsuarios: (req, res) => {
-    res.json(usuarios);
+  listarUsuarios: async (req, res) => {
+    try {
+      const usuarios = await UsuarioService.getAllUsers();
+      res.json(usuarios);
+    } catch (error) {
+      console.error('Erro ao listar usuários:', error);
+      res.status(500).json({ error: error.message });
+    }
   },
 
   // API - Criar usuário
-  criarUsuario: (req, res) => {
-    const { nome, email, senha } = req.body;
-    
-    // Validações básicas
-    if (!nome || !email || !senha) {
-      return res.status(400).json({ 
-        error: 'Nome, email e senha são obrigatórios' 
+  criarUsuario: async (req, res) => {
+    try {
+      const { nome, email, senha } = req.body;
+      
+      // Validações básicas
+      if (!nome || !email || !senha) {
+        return res.status(400).json({ 
+          error: 'Nome, email e senha são obrigatórios' 
+        });
+      }
+      
+      // Validar formato do email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ 
+          error: 'Formato de email inválido' 
+        });
+      }
+      
+      // Validar senha mínima
+      if (senha.length < 6) {
+        return res.status(400).json({ 
+          error: 'A senha deve ter pelo menos 6 caracteres' 
+        });
+      }
+      
+      const novoUsuario = await UsuarioService.createUser(nome, email, senha);
+      
+      // Retornar sucesso com dados do usuário
+      res.status(201).json({
+        success: true,
+        message: 'Usuário cadastrado com sucesso!',
+        usuario: novoUsuario,
+        redirectUrl: '/tarefas'
+      });
+      
+    } catch (error) {
+      console.error('Erro ao criar usuário:', error);
+      res.status(400).json({ 
+        error: error.message || 'Erro interno do servidor' 
       });
     }
-    
-    // Verificar se email já existe
-    const emailExiste = usuarios.find(user => user.email === email);
-    if (emailExiste) {
-      return res.status(400).json({ 
-        error: 'Este email já está cadastrado' 
-      });
-    }
-    
-    // Validar senha mínima
-    if (senha.length < 6) {
-      return res.status(400).json({ 
-        error: 'A senha deve ter pelo menos 6 caracteres' 
-      });
-    }
-    
-    const novoUsuario = new Usuario(Date.now(), nome, email, senha);
-    usuarios.push(novoUsuario);
-    
-    // Retornar usuário sem a senha
-    const { senha: _, ...usuarioResponse } = novoUsuario;
-    res.status(201).json(usuarioResponse);
   },
 
   // API - Obter usuário por ID
-  obterUsuario: (req, res) => {
-    const { id } = req.params;
-    const usuario = usuarios.find(u => u.id == id);
-    
-    if (!usuario) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
+  obterUsuario: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const usuario = await UsuarioService.getUserById(id);
+      
+      if (!usuario) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
+      }
+      
+      res.json(usuario);
+    } catch (error) {
+      console.error('Erro ao obter usuário:', error);
+      res.status(500).json({ error: error.message });
     }
-    
-    // Retornar usuário sem a senha
-    const { senha: _, ...usuarioResponse } = usuario;
-    res.json(usuarioResponse);
   },
 
   // API - Atualizar usuário
-  atualizarUsuario: (req, res) => {
-    const { id } = req.params;
-    const { nome, email } = req.body;
-    
-    const usuarioIndex = usuarios.findIndex(u => u.id == id);
-    if (usuarioIndex === -1) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
-    }
-    
-    // Verificar se novo email já existe (exceto o próprio usuário)
-    if (email) {
-      const emailExiste = usuarios.find(u => u.email === email && u.id != id);
-      if (emailExiste) {
-        return res.status(400).json({ 
-          error: 'Este email já está cadastrado' 
-        });
+  atualizarUsuario: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { nome, email } = req.body;
+      
+      // Verificar se o usuário existe
+      const usuarioExistente = await UsuarioService.getUserById(id);
+      if (!usuarioExistente) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
       }
+      
+      // Validar formato do email se fornecido
+      if (email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return res.status(400).json({ 
+            error: 'Formato de email inválido' 
+          });
+        }
+      }
+      
+      const usuarioAtualizado = await UsuarioService.updateUser(id, nome, email);
+      res.json({
+        success: true,
+        message: 'Usuário atualizado com sucesso!',
+        usuario: usuarioAtualizado
+      });
+      
+    } catch (error) {
+      console.error('Erro ao atualizar usuário:', error);
+      res.status(400).json({ error: error.message });
     }
-    
-    // Atualizar dados
-    if (nome) usuarios[usuarioIndex].nome = nome;
-    if (email) usuarios[usuarioIndex].email = email;
-    
-    // Retornar usuário atualizado sem a senha
-    const { senha: _, ...usuarioResponse } = usuarios[usuarioIndex];
-    res.json(usuarioResponse);
   },
 
   // API - Excluir usuário
-  excluirUsuario: (req, res) => {
-    const { id } = req.params;
-    const usuarioIndex = usuarios.findIndex(u => u.id == id);
-    
-    if (usuarioIndex === -1) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
+  excluirUsuario: async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Verificar se o usuário existe
+      const usuarioExistente = await UsuarioService.getUserById(id);
+      if (!usuarioExistente) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
+      }
+      
+      await UsuarioService.deleteUser(id);
+      res.json({ 
+        success: true,
+        message: 'Usuário excluído com sucesso' 
+      });
+      
+    } catch (error) {
+      console.error('Erro ao excluir usuário:', error);
+      res.status(500).json({ error: error.message });
     }
-    
-    usuarios.splice(usuarioIndex, 1);
-    res.json({ message: 'Usuário excluído com sucesso' });
   }
 };

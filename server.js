@@ -42,6 +42,22 @@ app.get('/dashboard', async (req, res) => {
   }
 });
 
+// Novo endpoint para retornar as tarefas (dados para o dashboard)
+app.get('/tarefas/api', async (req, res) => {
+  try {
+    // Aqui você pode buscar as tarefas do banco de dados ou de outro serviço
+    // Exemplo de dados fictícios:
+    const tasks = [
+      { titulo: "Task 1", status: "pendente", usuario_nome: "Alice" },
+      { titulo: "Task 2", status: "em-andamento", usuario_nome: "Bob" },
+      { titulo: "Task 3", status: "concluida", usuario_nome: "Charlie" }
+    ];
+    res.json(tasks);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Rota para página de usuários
 app.get('/usuarios', async (req, res) => {
   try {
@@ -64,17 +80,25 @@ app.get('/categorias', async (req, res) => {
   }
 });
 
-// Middleware de erro 404
+// Middleware de erro 404 - Diferencia resposta entre API e HTML
 app.use((req, res, next) => {
-  res.status(404).render('pages/404', {
+  res.status(404);
+  if (req.originalUrl.startsWith('/api/')) {
+    return res.json({ error: 'Endpoint não encontrado' });
+  }
+  res.render('pages/404', {
     pageTitle: 'Página não encontrada'
   });
 });
 
-// Middleware de erro 500
+// Middleware de erro 500 - Diferencia resposta entre API e HTML
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).render('pages/error', {
+  res.status(500);
+  if (req.originalUrl.startsWith('/api/')) {
+    return res.json({ error: err.message });
+  }
+  res.render('pages/error', {
     pageTitle: 'Erro do servidor',
     error: err.message
   });
@@ -84,3 +108,12 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
+
+require('child_process').exec(`start http://localhost:${PORT}/usuarios`)
+
+
+
+
+
+
+
