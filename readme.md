@@ -183,3 +183,8 @@ npm install
 node server.js
 
 http://localhost:3000
+
+
+### Link Vídeo da etrega da ponderada semana 8
+
+https://youtu.be/62_LEAFiisk
